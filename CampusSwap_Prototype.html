@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CampusSwap: sell textbooks to students on your campus</title>
+<style>
+:root{--ink:#14213D;--bg:#F6F8FB;--line:#C4CDDA;--brand:#0F5C63;--sun:#FFC845;--muted:#44505F;--focus:#1D4ED8}
+*{box-sizing:border-box}
+body{margin:0;font:1rem/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;line-height:1.2;margin:0 0 .5rem}
+h1{font-size:2rem;max-width:34ch}h2{font-size:1.35rem}h3{font-size:1.1rem}
+a{color:var(--brand)}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+h1[tabindex="-1"]:focus{outline:none}
+input[type=range]{accent-color:var(--brand)}
+.skip{position:absolute;left:-999px;top:0;background:var(--sun);color:var(--ink);padding:.6rem 1rem;z-index:20}
+.skip:focus{left:0}
+header{background:var(--ink)}
+.bar,main{max-width:72rem;margin:auto;padding:.75rem 1rem}
+.bar{display:flex;flex-wrap:wrap;gap:.5rem 1rem;align-items:center;justify-content:space-between}
+main{padding-bottom:3rem}
+.logo{font:700 1.4rem Georgia,serif;color:#fff;text-decoration:none}
+.logo span{background:var(--sun);color:var(--ink);padding:0 .35rem;border-radius:.3rem;margin-right:.25rem}
+nav{display:flex;gap:.25rem}
+nav a{color:#fff;text-decoration:none;padding:.5rem .9rem;border-radius:.4rem;min-height:2.75rem;display:inline-flex;align-items:center}
+nav a[aria-current=page]{background:#fff;color:var(--ink);font-weight:700}
+header :focus-visible{outline-color:var(--sun)}
+.lead{color:var(--muted);margin:0 0 1.25rem}
+.btn{font:inherit;font-weight:600;min-height:2.75rem;padding:.5rem 1.1rem;border-radius:.45rem;border:2px solid var(--brand);background:var(--brand);color:#fff;cursor:pointer}
+.btn.alt{background:#fff;color:var(--brand)}
+.btn.danger{background:#fff;color:#8A1C1C;border-color:#8A1C1C}
+.btn[aria-pressed=true]{background:var(--sun);color:var(--ink);border-color:var(--ink)}
+.link{font:inherit;background:none;border:0;color:var(--brand);text-decoration:underline;cursor:pointer;padding:.5rem 0;min-height:2.75rem}
+input,select,textarea{font:inherit;color:var(--ink);padding:.5rem .65rem;border:2px solid #6B7788;border-radius:.4rem;background:#fff;min-height:2.75rem;max-width:100%}
+input[type=checkbox],input[type=radio]{min-height:0;width:1.2rem;height:1.2rem;accent-color:var(--brand)}
+input[type=range]{padding:0;border:0;width:100%}
+label{font-weight:600;display:block;margin:.8rem 0 .25rem}
+label.in{font-weight:400;display:flex;gap:.5rem;align-items:center;margin:.35rem 0;min-height:2rem}
+fieldset{border:0;padding:0;margin:.8rem 0 0}legend{font-weight:600;padding:0}
+.layout{display:grid;grid-template-columns:16rem 1fr;gap:1.5rem;align-items:start}
+.panel{background:#fff;border:1px solid var(--line);border-radius:.6rem;padding:1rem 1.1rem;margin-bottom:1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr));gap:1rem}
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:.6rem;overflow:hidden}
+.card h3{margin:.4rem 0 .1rem}.card .bd{padding:.7rem .9rem .9rem}
+.card h3 a{color:var(--ink);text-decoration:none}.card h3 a::after{content:"";position:absolute;inset:0}
+.card:hover{border-color:var(--ink)}.card:focus-within{outline:3px solid var(--focus)}
+.art{display:block;width:100%;height:auto}
+.price{font:700 1.4rem Georgia,serif;margin:.1rem 0}
+.meta{color:var(--muted);font-size:.9rem;margin:0}
+.b{display:inline-block;padding:.1rem .6rem;border-radius:1rem;font-size:.85rem;font-weight:700;margin-right:.3rem}
+.b.Available{background:#DDF3E4;color:#14602F}.b.Reserved{background:#FFEDB8;color:#6B4A00}.b.Sold{background:#E3E7ED;color:#30394A}.b.tr{background:#E0ECFF;color:#17306B}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:1.5rem;align-items:start}
+dl{display:grid;grid-template-columns:auto 1fr;gap:.2rem 1rem;margin:.8rem 0}dt{font-weight:600}dd{margin:0}
+.row{display:flex;flex-wrap:wrap;gap:.6rem;margin:1rem 0}
+.safe{background:#FFF6D6;border-left:6px solid var(--sun);padding:.7rem 1rem;border-radius:.3rem}
+.log{list-style:none;margin:.5rem 0;padding:0;max-height:14rem;overflow:auto}
+.log li{padding:.45rem .8rem;border-radius:.6rem;margin:.3rem 0;max-width:85%;background:#E8EDF4}
+.log li.me{background:var(--brand);color:#fff;margin-left:auto}
+.chips{display:flex;flex-wrap:wrap;gap:.4rem;margin:.4rem 0}.chips button{font:inherit;min-height:2.5rem;padding:.2rem .8rem;border-radius:2rem;border:1px solid var(--ink);background:#fff;cursor:pointer}
+.err{color:#9B1C1C;font-weight:600;margin:.25rem 0 0}[aria-invalid=true]{border-color:#9B1C1C}
+.hint{background:#E0ECFF;color:#17306B;padding:.4rem .7rem;border-radius:.4rem;margin:.4rem 0}
+.sold{background:var(--sun);border:2px solid var(--ink);border-radius:.6rem;padding:.8rem 1rem;margin-bottom:1rem;font-weight:600;animation:pop .35s}
+@keyframes pop{from{transform:scale(.96);opacity:0}}
+.mine{display:flex;flex-wrap:wrap;gap:.8rem;align-items:center;justify-content:space-between}
+.mine svg{width:5rem;border-radius:.4rem}.mine .info{flex:1 1 12rem}
+#toast{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.75rem 1.2rem;border-radius:.5rem;opacity:0;pointer-events:none;transition:opacity .2s;max-width:90vw;z-index:30}
+#toast.on{opacity:1}
+dialog{border:2px solid var(--ink);border-radius:.6rem;max-width:26rem;padding:1.3rem}
+dialog::backdrop{background:rgba(20,33,61,.6)}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:48rem){.layout,.two,.lay2{grid-template-columns:1fr}h1{font-size:1.6rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.lay2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:1.5rem;align-items:start}
+.steps{display:flex;flex-wrap:wrap;gap:.5rem;list-style:none;padding:0;margin:0 0 1rem}
+.steps li{padding:.35rem .8rem;border-radius:2rem;border:2px solid var(--line);background:#fff;font-weight:600}
+.steps li[aria-current=step]{background:var(--ink);color:#fff;border-color:var(--ink)}.steps li.done{border-color:var(--brand);color:var(--brand)}
+fieldset h2{font-size:1.2rem}h2[tabindex="-1"]:focus,h3[tabindex="-1"]:focus{outline:none}
+.mine img.art{width:5rem;border-radius:.4rem}#bn{margin:.8rem 0}#bn:empty{display:none}#bn.hint{font-weight:600}
+@media(max-width:48rem){.lay2{grid-template-columns:1fr}}
+.note{margin:0;background:#FFF6D6;border-bottom:3px solid var(--sun);padding:.5rem 1rem;text-align:center;font-size:.95rem}
+.sim{display:block;font-size:.8rem;color:var(--muted);font-style:italic}
+</style>
+</head>
+<body>
+<a class="skip" href="#h">Skip to main content</a>
+<header><div class="bar">
+<a class="logo" href="#/mine" aria-label="CampusSwap home"><span>C</span>CampusSwap</a>
+<nav aria-label="Main"><a href="#/mine">My listings</a><a href="#/new">List a textbook</a></nav>
+</div></header>
+<p class="note" role="note"><strong>Prototype.</strong> Sample data only. Buyer messages and replies are simulated, and nothing is saved when you refresh or close this page.</p>
+<main></main>
+<div id="toast" role="status"></div>
+<dialog id="dlg" aria-labelledby="dt"><form method="dialog">
+<h2 id="dt">Delete this listing?</h2><p>Buyers will no longer see it, and your chats about it will be removed. You can't undo this.</p>
+<div class="row"><button class="btn alt" value="no">Keep listing</button><button class="btn danger" value="del">Delete listing</button></div>
+</form></dialog>
+<script>
+const $=s=>document.querySelector(s),main=$('main');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const C={Textbooks:'#2F5F98',Furniture:'#A85A12',"Dorm essentials":'#1F7A5C'};
+const SH={
+book:c=>`<rect x="32" y="16" width="58" height="58" rx="3" fill="#fff"/><rect x="32" y="16" width="12" height="58" fill="${c}"/><path d="M52 32h30M52 42h22M52 52h26" stroke="${c}" stroke-width="4"/>`,
+chair:c=>`<rect x="40" y="14" width="8" height="42" fill="${c}"/><rect x="40" y="46" width="42" height="9" fill="#fff"/><rect x="42" y="55" width="6" height="26" fill="#fff"/><rect x="74" y="55" width="6" height="26" fill="#fff"/>`,
+lamp:c=>`<ellipse cx="60" cy="78" rx="20" ry="5" fill="#fff"/><rect x="58" y="34" width="4" height="44" fill="#fff"/><path d="M40 34h40L70 10H50z" fill="${c}"/>`,
+fridge:c=>`<rect x="38" y="8" width="44" height="74" rx="4" fill="#fff"/><path d="M38 34h44"/><rect x="45" y="16" width="4" height="12" fill="${c}"/><rect x="45" y="42" width="4" height="16" fill="${c}"/>`,
+desk:c=>`<rect x="18" y="32" width="84" height="8" fill="#fff"/><rect x="24" y="40" width="6" height="40" fill="#fff"/><rect x="90" y="40" width="6" height="40" fill="#fff"/><rect x="58" y="40" width="28" height="18" fill="${c}"/>`};
+const art=i=>i.img?`<img class="art" src="${i.img}" alt="${esc(i.alt)}">`:`<svg class="art" viewBox="0 0 120 90" role="img" aria-label="${esc(i.alt)}" style="background:${i.col}28"><g stroke="#14213D" stroke-width="2">${SH.book(i.col)}</g></svg>`;
+const COL=['#2F5F98','#1F7A5C','#7A3E8E','#A85A12'],COND=['Like new','Good','Fair','Heavily used'],PICK=['Library foyer','Student centre','Res A reception','Res B reception','Res C reception'];
+const RANGE={'Like new':[200,350],Good:[150,280],Fair:[90,200],'Heavily used':[50,120]},QR=['Yes, it is still available.','Could we meet at the library foyer at 1pm?','Sorry, this has been sold.'];
+const BAD=/\b(pdf|photocopy|photocopied|photocopies|scan|scanned|ebook|e-book|pirated)\b/i,RISK=/(\+?\d[\d\s-]{7,}\d)|@|\b(eft|bank|banking|deposit|paypal|snapscan|whatsapp)\b/i;
+const T=i=>esc(i.t)+(i.ed?', '+esc(i.ed):'');
+let I=[
+{id:1,t:'Networking Essentials',ed:'7th edition',cond:'Good',col:COL[0],p:190,loc:'Library foyer',st:'Available',d:'Second-year IT module. Light highlighting in the first three chapters.',alt:'Blue networking textbook with a diagram on the cover',en:[{n:'Sipho K.',m:[{t:'Hi, is this still available?'}]},{n:'Aisha P.',m:[{t:'Would you take R160?'}]}],qs:[{q:'Does it include the study guide?',a:''}]},
+{id:2,t:'Calculus: Early Transcendentals',ed:'8th edition',cond:'Like new',col:COL[1],p:280,loc:'Res A reception',st:'Reserved',d:'Used for one semester. No writing inside.',alt:'Green calculus textbook standing upright',en:[{n:'Lerato D.',m:[{t:'Lovely, I can collect it on Friday.'},{me:1,t:'Perfect, see you at Res A reception at 5pm.'}]}],qs:[]},
+{id:3,t:'Introduction to Accounting',ed:'3rd edition',cond:'Fair',col:COL[2],p:220,loc:'Student centre',st:'Sold',d:'Cover is worn but all pages are intact.',alt:'Purple accounting textbook with a worn cover',en:[{n:'Jordan W.',m:[{t:'Collected, thanks!'}]}],qs:[],buyer:'Jordan W.'}];
+let pend=0,tt;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),4000)}
+const done=()=>{const h=$('#h');if(h)h.focus()},bd=i=>`<span class="b ${i.st}">${i.st}</span>`;
+function route(){const [v,id]=(location.hash.slice(2)||'mine').split('/');
+document.querySelectorAll('nav a').forEach(a=>a.getAttribute('href')==='#/'+(v==='listing'?'mine':v)?a.setAttribute('aria-current','page'):a.removeAttribute('aria-current'));
+({mine,new:newItem,listing}[v]||mine)(id);window.scrollTo(0,0);done()}
+function mine(){const act=I.filter(i=>i.st!=='Sold').length;
+main.innerHTML=`<h1 id="h" tabindex="-1">My listings</h1><p class="lead">Every textbook you are selling, in one place.</p>
+<div class="row" style="align-items:center;margin-top:0"><a class="btn" href="#/new" style="text-decoration:none;display:inline-flex;align-items:center">List a textbook</a><p class="meta" role="status" style="margin:0">${act} active, ${I.length-act} sold</p></div>
+${I.length?I.map(i=>{const n=i.en.length;return `<article class="panel mine">${art(i)}<div class="info"><h2 style="font-size:1.1rem;margin:0"><a href="#/listing/${i.id}">${T(i)}</a></h2><p class="meta">R${i.p}, ${i.cond}, ${esc(i.loc)}</p>${bd(i)} ${n?`<span class="meta">${n} buyer ${n==1?'enquiry':'enquiries'}</span>`:''}</div><a class="btn alt" style="text-decoration:none" href="#/listing/${i.id}">Manage<span class="vh"> ${T(i)}</span></a></article>`}).join(''):'<div class="panel"><h2>No listings yet</h2><p>Your first listing takes about two minutes.</p></div>'}`}
+function newItem(){const S={step:1,img:''},TT=['Photo','Textbook details','Price','Details and pick-up'];
+main.innerHTML=`<h1 id="h" tabindex="-1">List a textbook</h1><p class="lead">Four quick steps. You can change anything after posting.</p><ol class="steps" id="st" aria-label="Progress"></ol>
+<div class="lay2"><form id="sf" class="panel" novalidate>
+<fieldset id="s1" aria-labelledby="t1"><h2 id="t1" tabindex="-1">Step 1 of 4: Photo</h2><label for="ph">Add a photo of the cover</label><input id="ph" type="file" accept="image/*"><p class="meta">A clear photo in daylight helps your book sell faster.</p>
+<label for="pa">Describe the photo for screen reader users</label><input id="pa" style="width:100%" placeholder="For example, blue textbook lying flat on a desk" aria-describedby="e0"><p class="err" id="e0" role="alert"></p></fieldset>
+<fieldset id="s2" aria-labelledby="t2" hidden><h2 id="t2" tabindex="-1">Step 2 of 4: Textbook details</h2><label for="ti">Textbook title</label><input id="ti" style="width:100%" placeholder="For example, Calculus: Early Transcendentals" aria-describedby="e1"><p class="err" id="e1" role="alert"></p>
+<label for="ed">Edition (optional)</label><input id="ed" placeholder="For example, 8th edition"><label for="co">Condition</label><select id="co" aria-describedby="e2"><option value="">Choose the condition</option>${COND.map(c=>`<option>${c}</option>`).join('')}</select><p class="err" id="e2" role="alert"></p></fieldset>
+<fieldset id="s3" aria-labelledby="t3" hidden><h2 id="t3" tabindex="-1">Step 3 of 4: Price</h2><div id="hn" class="hint" role="status" hidden></div><label for="pr">Price in rand</label><input id="pr" type="number" min="1" inputmode="numeric" aria-describedby="e3"><p class="err" id="e3" role="alert"></p></fieldset>
+<fieldset id="s4" aria-labelledby="t4" hidden><h2 id="t4" tabindex="-1">Step 4 of 4: Details and pick-up</h2><label for="ds">Description (optional)</label><textarea id="ds" rows="3" style="width:100%" placeholder="Highlighting, study guide included, and so on" aria-describedby="e4"></textarea><p class="err" id="e4" role="alert"></p>
+<label for="lo">Pick-up spot</label><select id="lo">${PICK.map(l=>`<option>${l}</option>`).join('')}</select>
+<p class="safe"><strong>Community guidelines.</strong> List original printed textbooks only. Keep chat and payment on campus and treat other students with respect. Only busy campus pick-up spots are offered, and your home address is never shown. Listings that break these guidelines may be removed.</p>
+<label class="in"><input type="checkbox" id="ok" aria-describedby="e5">I confirm this is an original printed textbook, not a photocopy or digital file.</label><p class="err" id="e5" role="alert"></p></fieldset>
+<div class="row"><button type="button" class="btn alt" id="bk" hidden>Back</button><button class="btn" id="nx">Next</button><a class="btn alt" href="#/mine" style="text-decoration:none;display:inline-flex;align-items:center">Cancel</a></div></form>
+<aside aria-labelledby="pvh"><h2 id="pvh" style="font-size:1.1rem">How buyers will see it</h2><article class="card" id="pv"></article></aside></div>`;
+const paint=()=>{$('#st').innerHTML=TT.map((x,n)=>`<li${n+1==S.step?' aria-current="step"':''}${n+1<S.step?' class="done"':''}>${n+1}. ${x}${n+1<S.step?'<span class="vh"> (completed)</span>':''}</li>`).join('');
+for(let n=1;n<=4;n++)$('#s'+n).hidden=n!==S.step;$('#bk').hidden=S.step==1;$('#nx').textContent=S.step==4?'Post listing':'Next'};
+const prev=()=>{const t=$('#ti').value.trim(),e=$('#ed').value.trim(),c=$('#co').value,p=+$('#pr').value;$('#pv').innerHTML=(S.img?art({img:S.img,alt:$('#pa').value||t||'Textbook photo'}):art({col:COL[0],alt:'Placeholder illustration of a textbook'}))+`<div class="bd"><span class="b Available">Available</span>${c?`<span class="b tr">${c}</span>`:''}<h3>${t?esc(t)+(e?', '+esc(e):''):'Textbook title'}</h3><p class="price">${p>0?'R'+p:'Price not set'}</p><p class="meta">${esc($('#lo').value)}</p></div>`};
+const hint=()=>{const c=$('#co').value,r=RANGE[c],h=$('#hn');h.hidden=!r;if(r)h.textContent=`Sample guidance: used textbooks in ${c.toLowerCase()} condition typically sell for R${r[0]} to R${r[1]} on campus.`};
+const chk=l=>{let bad=null;l.forEach(([f,m,ok,t])=>{const el=$(f);$(m).textContent=ok?'':t;if(ok)el.removeAttribute('aria-invalid');else{el.setAttribute('aria-invalid','true');bad=bad||el}});return bad};
+const NOCOPY='Photocopies and digital files cannot be listed. Please list an original printed textbook.';
+const rules={1:()=>[['#pa','#e0',!($('#ph').files[0]&&!$('#pa').value.trim()),'Describe the photo so buyers using screen readers know what it shows.']],
+2:()=>{const t=$('#ti').value.trim();return [['#ti','#e1',!!t&&!BAD.test(t),t?NOCOPY:'Enter the textbook title, for example "Calculus: Early Transcendentals".'],['#co','#e2',!!$('#co').value,'Choose the condition so buyers know what to expect.']]},
+3:()=>[['#pr','#e3',+$('#pr').value>0,'Enter a price above R0.']],
+4:()=>[['#ds','#e4',!BAD.test($('#ds').value),'Photocopies and digital files cannot be listed. Please describe an original printed textbook.'],['#ok','#e5',$('#ok').checked,'Please confirm that this is an original printed textbook.']]};
+$('#ph').onchange=e=>{const f=e.target.files[0];if(!f){S.img='';prev();return}const r=new FileReader();r.onload=()=>{S.img=r.result;prev()};r.readAsDataURL(f)};
+$('#sf').addEventListener('input',()=>{prev();hint();rules[S.step]().forEach(([f,m,ok])=>{if(ok){$(m).textContent='';$(f).removeAttribute('aria-invalid')}})});
+$('#bk').onclick=()=>{S.step--;paint();$('#t'+S.step).focus()};
+$('#sf').onsubmit=e=>{e.preventDefault();const b=chk(rules[S.step]());if(b){b.focus();return}
+if(S.step<4){S.step++;paint();hint();$('#t'+S.step).focus();return}
+const id=I.reduce((m,x)=>Math.max(m,x.id),0)+1;I.unshift({id,t:$('#ti').value.trim(),ed:$('#ed').value.trim(),cond:$('#co').value,col:COL[id%COL.length],p:+$('#pr').value,loc:$('#lo').value,st:'Available',d:$('#ds').value.trim()||'No description yet.',alt:$('#pa').value.trim()||$('#ti').value.trim(),img:S.img,en:[],qs:[]});
+location.hash='#/listing/'+id;toast('Nice, your listing is live!')};
+paint();prev()}
+function listing(id){const i=I.find(x=>x.id==id);if(!i)return mine();const sold=i.st==='Sold';
+const msg=(x,me)=>`<li${me?' class="me"':''}>${esc(x.t)}${x.sim?'<small class="sim">Simulated reply</small>':''}</li>`;
+main.innerHTML=`<p><a href="#/mine">Back to my listings</a></p><div class="two"><div>${art(i)}</div><div><h1 id="h" tabindex="-1">${T(i)}</h1><p>${bd(i)}<span class="b tr">${i.cond}</span></p><p class="price">R${i.p}</p><p>${esc(i.d)}</p>
+<dl><dt>Condition</dt><dd>${i.cond}</dd><dt>Pick up</dt><dd>${esc(i.loc)}</dd></dl><div id="bn" role="status"></div>
+<div class="row">${i.st==='Available'?'<button class="btn alt" data-s="Reserved">Mark as reserved</button>':''}${sold?'':'<button class="btn" data-s="Sold">Mark as sold</button>'}${i.st!=='Available'?'<button class="btn alt" data-s="Available">Mark as available</button>':''}<button class="btn alt" id="cp">Change price</button><button class="btn danger" id="dl">Delete listing</button></div>
+<form id="pf" class="panel" hidden><label for="np" style="margin-top:0">New price in rand</label><input id="np" type="number" min="1" value="${i.p}"><p class="err" id="ep" role="alert"></p><div class="row"><button class="btn">Save price</button></div></form>
+${sold?'':'<p class="safe"><strong>Before you meet.</strong> Choose the pick-up spot you listed, go in daylight and hand over the book when you have the payment.</p>'}</div></div>
+${sold?`<section class="panel" aria-labelledby="rh"><h2 id="rh">Rate your buyer</h2>${i.rated?'<p>Thanks. Your rating helps keep CampusSwap trusted.</p>':`<form id="rf"><fieldset><legend>How was the exchange with ${esc(i.buyer||'the buyer')}?</legend>${[5,4,3,2,1].map(n=>`<label class="in"><input type="radio" name="r" value="${n}">${n} out of 5</label>`).join('')}</fieldset><p class="err" id="er" role="alert"></p><div class="row"><button class="btn">Send rating</button></div></form>`}</section>`:''}
+<section aria-labelledby="eh"><h2 id="eh">Buyer enquiries</h2>${i.en.length?i.en.map((t,ti)=>t.blocked?`<section class="panel" aria-labelledby="th${ti}"><h3 id="th${ti}">${esc(t.n)}</h3><p>You have blocked this buyer. They can no longer message you about this listing.</p><button class="btn alt" data-ub="${ti}">Unblock<span class="vh"> ${esc(t.n)}</span></button></section>`:`<section class="panel" aria-labelledby="th${ti}"><div class="row" style="justify-content:space-between;align-items:center;margin:0 0 .4rem"><h3 id="th${ti}" style="margin:0">${esc(t.n)}</h3>${sold?'':`<span class="row" style="margin:0"><button class="btn alt" data-rp="${ti}">Report buyer<span class="vh"> ${esc(t.n)}</span></button><button class="btn danger" data-bl="${ti}">Block buyer<span class="vh"> ${esc(t.n)}</span></button></span>`}</div><ul class="log" id="lg${ti}" role="log" aria-label="Conversation with ${esc(t.n)}">${t.m.map(x=>msg(x,x.me)).join('')}</ul>${sold?'':`<div class="chips" id="ch${ti}">${QR.map(q=>`<button type="button">${q}</button>`).join('')}</div><div id="w${ti}"></div><form id="cf${ti}"><label class="vh" for="cm${ti}">Reply to ${esc(t.n)}</label><div class="row" style="margin:0"><input id="cm${ti}" style="flex:1 1 14rem" autocomplete="off" placeholder="Write a reply"><button class="btn">Send reply</button></div></form>`}</section>`).join(''):'<p class="panel">No enquiries yet. Buyers will message you here.</p>'}</section>
+<section class="panel" aria-labelledby="qh"><h2 id="qh">Questions from other students</h2><ul style="padding-left:1.1rem">${i.qs.length?i.qs.map((x,qi)=>`<li><strong>${esc(x.q)}</strong> <button class="link" data-rq="${qi}">Report question</button><br>${x.a?esc(x.a):`<form class="qa" data-q="${qi}"><label for="a${qi}">Your answer, shown to all students</label><div class="row" style="margin:0"><input id="a${qi}" style="flex:1 1 14rem"><button class="btn alt">Post answer</button></div></form>`}</li>`).join(''):'<li>No questions yet.</li>'}</ul></section>`;
+main.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>{const s=b.dataset.s;i.st=s;listing(i.id);const n=$('#bn');n.className=s==='Sold'?'sold':'hint';n.textContent={Sold:`Sold! Your ${i.t} has a new home. Rate your buyer below when you are ready.`,Reserved:'Marked as reserved. Buyers can see it is on hold.',Available:'Back on the shelf. Buyers can see your listing again.'}[s]});
+$('#dl').onclick=()=>{pend=i.id;$('#dlg').showModal()};
+$('#cp').onclick=()=>{$('#pf').hidden=false;$('#np').focus()};
+$('#pf').onsubmit=e=>{e.preventDefault();const v=+$('#np').value;if(!(v>0)){$('#ep').textContent='Enter a price above R0.';$('#np').setAttribute('aria-invalid','true');$('#np').focus();return}i.p=v;listing(i.id);toast('Price updated to R'+v+'.')};
+if($('#rf'))$('#rf').onsubmit=e=>{e.preventDefault();if(!$('#rf').r.value){$('#er').textContent='Choose a rating from 1 to 5.';return}i.rated=1;listing(i.id);toast('Rating sent. Thank you.')};
+main.querySelectorAll('.qa').forEach(f=>f.onsubmit=e=>{e.preventDefault();const v=f.querySelector('input').value.trim();if(!v)return toast('Type your answer first.');i.qs[f.dataset.q].a=v;listing(i.id);toast('Answer posted. Everyone can see it now.')});
+main.querySelectorAll('[data-rq]').forEach(b=>b.onclick=()=>toast('Report recorded. In the live service, a moderator would now review this question.'));
+main.querySelectorAll('[data-rp]').forEach(b=>b.onclick=()=>toast('Report recorded. In the live service, a moderator would now review this conversation.'));
+main.querySelectorAll('[data-bl]').forEach(b=>b.onclick=()=>{i.en[b.dataset.bl].blocked=1;listing(i.id);toast('Buyer blocked. You can unblock them at any time.')});
+main.querySelectorAll('[data-ub]').forEach(b=>b.onclick=()=>{i.en[b.dataset.ub].blocked=0;listing(i.id);toast('Buyer unblocked.')});
+if(!sold)i.en.forEach((t,ti)=>{if(t.blocked)return;const lg=$('#lg'+ti),inp=$('#cm'+ti),w=$('#w'+ti),say=(x,me,sim)=>{lg.insertAdjacentHTML('beforeend',msg({t:x,sim},me));lg.scrollTop=1e5};
+const send=m=>{t.m.push({me:1,t:m});say(m,1);inp.value='';setTimeout(()=>{t.m.push({t:'Great, thanks!',sim:1});say('Great, thanks!',0,1)},900)};
+main.querySelectorAll(`#ch${ti} button`).forEach(b=>b.onclick=()=>{inp.value=b.textContent;inp.focus()});
+$('#cf'+ti).onsubmit=e=>{e.preventDefault();const m=inp.value.trim();w.innerHTML='';if(!m)return toast('Type a reply before sending.');
+if(RISK.test(m)){w.innerHTML='<div class="safe" role="alert"><strong>Keep it safe.</strong> Sharing phone numbers or bank details, or paying online, can expose you to scams. Arrange hand-over and payment in person on campus.<div class="row"><button type="button" class="btn alt" data-e>Edit message</button><button type="button" class="btn danger" data-g>Send anyway</button></div></div>';w.querySelector('[data-e]').onclick=()=>{w.innerHTML='';inp.focus()};w.querySelector('[data-g]').onclick=()=>{w.innerHTML='';send(m)};return}
+send(m)}})}
+$('#dlg').addEventListener('close',()=>{if($('#dlg').returnValue==='del'){I=I.filter(i=>i.id!==pend);location.hash='#/mine';toast('Listing deleted.')}$('#dlg').returnValue=''});
+addEventListener('hashchange',route);route();
+</script>
+</body>
+</html>
